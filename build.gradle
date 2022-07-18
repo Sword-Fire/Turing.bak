@@ -1,0 +1,77 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer
+
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.6.20'
+    id 'groovy'
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+//取消-all后缀
+shadowJar {
+    archiveClassifier.set('')
+    transform(Log4j2PluginsCacheFileTransformer)
+    mergeServiceFiles()
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'net.geekmc.turingserver.TuringServer',
+                "Multi-Release": true
+    }
+}
+
+group 'net.geekmc'
+version '1.0-SNAPSHOT'
+
+repositories {
+    maven { url 'https://repo.spongepowered.org/maven' }
+    maven { url 'https://jitpack.io' }
+    mavenCentral()
+}
+
+dependencies {
+
+    // Minestom
+    implementation('com.github.Minestom:Minestom:7af3e1c2e2dfa95de395e257bbac6fca1e3e835b') {
+        exclude group: 'org.tinylog'
+    }
+
+    //kotlin
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:1.6.20"
+
+    //dependency for groovy
+    implementation 'org.fusesource.jansi:jansi:2.4.0'
+
+    // groovy
+    implementation platform('org.apache.groovy:groovy-all:4.0.1')
+
+    // lombok
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    implementation 'org.projectlombok:lombok:1.18.22'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+    testImplementation 'org.projectlombok:lombok:1.18.22'
+
+    // logging
+    implementation 'org.apache.logging.log4j:log4j-core:2.17.1'
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.17.1'
+
+    // snake-yaml
+    implementation 'org.yaml:snakeyaml:1.30'
+
+    // KStom
+    // https://github.com/Project-Cepi/KStom
+    implementation 'com.github.Project-Cepi:KStom:67be3adc9dc8612972080e5b2cabdc04c560f202'
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+//设置kotlin的编译目标版本
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}

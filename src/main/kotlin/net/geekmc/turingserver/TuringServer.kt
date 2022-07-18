@@ -27,6 +27,7 @@ object TuringServer {
     @JvmStatic
     fun main(args: Array<String>) {
 
+        //test on dev branch
         minecraftServer = MinecraftServer.init()
 
         // Register Instance

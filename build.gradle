@@ -21,7 +21,7 @@ jar {
     }
 }
 
-group 'net.geekmc'
+group 'net.geekmc.turing'
 version '1.0-SNAPSHOT'
 
 repositories {

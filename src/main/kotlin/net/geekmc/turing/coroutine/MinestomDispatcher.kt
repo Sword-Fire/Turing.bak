@@ -13,7 +13,6 @@ object MinestomMainThreadExecutor : Executor {
 
     override fun execute(runnable: Runnable) {
         Manager.scheduler.scheduleNextTick(runnable)
-        println("added runnable ${runnable.}")
     }
 
 }

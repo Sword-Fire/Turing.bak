@@ -1,4 +1,4 @@
-package net.geekmc.turingserver.motd
+package net.geekmc.turing.motd
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor

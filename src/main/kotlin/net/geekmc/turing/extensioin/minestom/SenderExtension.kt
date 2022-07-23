@@ -1,4 +1,4 @@
-package net.geekmc.turingserver.extensioin.minestom
+package net.geekmc.turing.extensioin.minestom
 
 import net.minestom.server.command.CommandSender
 

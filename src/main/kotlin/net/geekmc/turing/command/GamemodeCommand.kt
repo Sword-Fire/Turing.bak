@@ -1,6 +1,6 @@
-package net.geekmc.turingserver.command
+package net.geekmc.turing.command
 
-import net.geekmc.turingserver.extensioin.minestom.sendColoredMessage
+import net.geekmc.turing.extensioin.minestom.sendColoredMessage
 import net.minestom.server.command.CommandSender
 import net.minestom.server.command.builder.Command
 import net.minestom.server.command.builder.CommandExecutor

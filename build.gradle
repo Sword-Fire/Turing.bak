@@ -16,7 +16,7 @@ shadowJar {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'net.geekmc.turingserver.TuringServer',
+        attributes 'Main-Class': 'net.geekmc.turing.Turing',
                 "Multi-Release": true
     }
 }
@@ -37,8 +37,10 @@ dependencies {
         exclude group: 'org.tinylog'
     }
 
-    //kotlin
+    // kotlin
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib:1.6.20"
+    // kotlin coroutines,which Minestom seems don't contain
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3")
 
     //dependency for groovy
     implementation 'org.fusesource.jansi:jansi:2.4.0'

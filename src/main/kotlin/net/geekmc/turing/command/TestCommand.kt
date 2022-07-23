@@ -1,4 +1,4 @@
-package net.geekmc.turingserver.command
+package net.geekmc.turing.command
 
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.minestom.server.command.builder.Command

@@ -1,4 +1,4 @@
-package net.geekmc.turingserver.command
+package net.geekmc.turing.command
 
 import net.minestom.server.command.builder.arguments.ArgumentType
 import world.cepi.kstom.command.arguments.literal

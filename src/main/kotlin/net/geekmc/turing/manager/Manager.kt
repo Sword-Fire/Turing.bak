@@ -1,4 +1,4 @@
-package net.geekmc.turingserver.manager
+package net.geekmc.turing.manager
 
 import net.minestom.server.MinecraftServer
 import net.minestom.server.event.Event
@@ -8,7 +8,7 @@ import net.minestom.server.instance.InstanceManager
 import net.minestom.server.monitoring.BenchmarkManager
 import net.minestom.server.timer.SchedulerManager
 
-object Manager {
+object TuringManager {
 
     val globalNode: GlobalEventHandler
         get() = MinecraftServer.getGlobalEventHandler()

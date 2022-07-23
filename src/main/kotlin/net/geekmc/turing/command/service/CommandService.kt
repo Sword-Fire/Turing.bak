@@ -1,5 +1,6 @@
-package net.geekmc.turingserver.command.service
+package net.geekmc.turing.command.service
 
+import net.geekmc.turing.command.*
 import net.geekmc.turingserver.command.*
 import net.minestom.server.MinecraftServer
 import net.minestom.server.command.CommandSender

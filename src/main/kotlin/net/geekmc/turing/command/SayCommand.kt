@@ -1,4 +1,4 @@
-package net.geekmc.turingserver.command
+package net.geekmc.turing.command
 
 import net.kyori.adventure.text.Component
 import net.minestom.server.MinecraftServer

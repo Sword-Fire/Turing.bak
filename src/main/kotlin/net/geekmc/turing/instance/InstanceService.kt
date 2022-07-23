@@ -1,4 +1,4 @@
-package net.geekmc.turingserver.instance
+package net.geekmc.turing.instance
 
 import net.minestom.server.MinecraftServer
 import net.minestom.server.instance.Instance

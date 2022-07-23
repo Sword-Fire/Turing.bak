@@ -1,13 +1,15 @@
-package net.geekmc.turingserver
+package net.geekmc.turing
 
-import net.geekmc.turingserver.command.service.CommandService
-import net.geekmc.turingserver.instance.InstanceService
-import net.geekmc.turingserver.listener.ListenerService
-import net.geekmc.turingserver.motd.MotdService
+import kotlinx.coroutines.*
+import net.geekmc.turing.command.service.CommandService
+import net.geekmc.turing.coroutine.Ticking
+import net.geekmc.turing.instance.InstanceService
+import net.geekmc.turing.motd.MotdService
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
-import net.minestom.server.event.entity.EntityTickEvent
+import net.minestom.server.entity.PlayerSkin
 import net.minestom.server.event.player.PlayerLoginEvent
+import net.minestom.server.event.player.PlayerSpawnEvent
 import net.minestom.server.extras.optifine.OptifineSupport
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
@@ -20,14 +22,13 @@ import java.io.IOException
 import java.nio.file.*
 
 
-object TuringServer {
+object Turing {
 
     lateinit var minecraftServer: MinecraftServer
 
     @JvmStatic
     fun main(args: Array<String>) {
 
-        //test on dev branch
         minecraftServer = MinecraftServer.init()
 
         // Register Instance
@@ -36,22 +37,47 @@ object TuringServer {
         val world = InstanceService.getInstance(InstanceService.MAIN_INSTANCE)
 
         // Register listeners
-        ListenerService.globalNode().addListener(
-            PlayerLoginEvent::class.java
-        ) { e ->
-            val p = e.player
+        Manager.globalEvent.addListener(PlayerLoginEvent::class.java) {
+            val p = it.player
 
-            e.setSpawningInstance(world)
+            it.setSpawningInstance(world)
             p.respawnPoint = Pos(0.0, 40.0, 0.0)
             p.sendMessage("Welcome to server, " + p.username + " !")
         }
 
-        Manager.globalEvent.listen<EntityTickEvent> {
-            expireCount = 50
-            removeWhen { entity.isCustomNameVisible }
-            filters += { entity.isGlowing }
+        // 应该放PlayerJoin Event 异步获取skin然后主线程setSkin
+        // init skin
+//        Manager.globalEvent.listen<PlayerSkinInitEvent> {
+//
+//            handler {
+//                skin = PlayerSkin.fromUsername(player.username)
+//            }
+//        }
+
+        Manager.globalEvent.listen<PlayerSpawnEvent> {
             handler {
-                entity.setGravity(5.0, .5)
+                if (!isFirstSpawn) return@handler
+
+                val scope = CoroutineScope(Dispatchers.IO)
+                scope.launch {
+
+                    //println("*${Thread.currentThread().name} get skin from mojang")
+                    delay(3000)
+                    val skin = withContext(Dispatchers.IO) {
+                        PlayerSkin.fromUsername(player.username)
+                    }
+                    //println("finish get skin at ${System.currentTimeMillis()}")
+
+                    // 切到主线程设置玩家皮肤
+                    withContext(Dispatchers.Ticking) {
+                        delay(100)
+                        println("${Thread.currentThread().name} set skin")
+                        player.skin = skin
+                    }
+                    println("${Thread.currentThread().name} coroutine end")
+
+                }
+
             }
         }
 
@@ -85,6 +111,8 @@ object TuringServer {
         println("changed to block")
         yaml.dump(map, writer)
         println("successfully dump data to target.yml")
+
+//         BungeeCordProxy.enable()
         //启动服务器
         minecraftServer.start("0.0.0.0", 25565)
 
@@ -109,9 +137,9 @@ object TuringServer {
 
             Files.createDirectories(Path.of(f.parent))
 
-            val inputStream = TuringServer::class.java.getResourceAsStream(source)
+            val inputStream = Turing::class.java.getResourceAsStream(source)
                 ?: throw IllegalArgumentException(
-                    "Resource $source can't be found in " + TuringServer::class.java.getResource(
+                    "Resource $source can't be found in " + Turing::class.java.getResource(
                         ""
                     )
                 )

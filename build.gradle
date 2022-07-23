@@ -22,7 +22,7 @@ jar {
 }
 
 group 'net.geekmc'
-version '1.0'
+version '1.0-SNAPSHOT'
 
 repositories {
     maven { url 'https://repo.spongepowered.org/maven' }

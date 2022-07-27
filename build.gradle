@@ -63,7 +63,7 @@ dependencies {
 
     // KStom
     // https://github.com/Project-Cepi/KStom
-    implementation 'com.github.Project-Cepi:KStom:67be3adc9dc8612972080e5b2cabdc04c560f202'
+    implementation 'com.github.Project-Cepi:KStom:67be3adc9d'
 
 }
 

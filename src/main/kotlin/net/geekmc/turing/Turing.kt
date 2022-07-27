@@ -31,6 +31,8 @@ object Turing {
 
         minecraftServer = MinecraftServer.init()
 
+        //Manager.dimensionType.
+
         // Register Instance
         InstanceService.initialize()
         InstanceService.createInstanceContainer(InstanceService.MAIN_INSTANCE)
@@ -80,6 +82,19 @@ object Turing {
 
             }
         }
+
+        val scope = CoroutineScope(Dispatchers.IO)
+        scope.launch {
+            println("hello")
+        }
+        scope.cancel()
+
+        val job=GlobalScope.launch {
+            println("hello")
+        }
+
+
+        job.cancel()
 
         OptifineSupport.enable()
 

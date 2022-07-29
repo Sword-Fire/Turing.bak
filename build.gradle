@@ -77,3 +77,6 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         jvmTarget = "17"
     }
 }
+
+sourceCompatibility = 17
+targetCompatibility = 17

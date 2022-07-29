@@ -33,7 +33,7 @@ repositories {
 dependencies {
 
     // Minestom
-    implementation('com.github.Minestom:Minestom:7af3e1c2e2dfa95de395e257bbac6fca1e3e835b') {
+    implementation('com.github.Minestom:Minestom:7af3e1c2e2') {
         exclude group: 'org.tinylog'
     }
 

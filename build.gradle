@@ -23,7 +23,7 @@ jar {
 }
 
 group 'net.geekmc.turing'
-version '1.0.4'
+version '1.0.6'
 
 publishing {
     publications {

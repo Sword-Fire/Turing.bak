@@ -23,14 +23,14 @@ jar {
 }
 
 group 'net.geekmc.turing'
-version '1.0.7'
+version '1.0.8'
 
 publishing {
     publications {
         myLibrary(MavenPublication) {
-            groupId = 'net.geekmc.turing'
-            artifactId = 'Turing'
-            version = '1.0.7'
+//            groupId = 'net.geekmc.turing'
+//            artifactId = 'Turing'
+//            version = '1.0.7'
 
             from components.java
         }

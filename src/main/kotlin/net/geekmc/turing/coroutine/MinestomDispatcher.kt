@@ -13,7 +13,6 @@ val Dispatchers.Ticking: CoroutineDispatcher
 object MinestomMainThreadExecutor : Executor {
 
     override fun execute(runnable: Runnable) {
-        println(Turing.toString())
         Manager.scheduler.scheduleNextTick(runnable)
     }
 

@@ -1,20 +1,11 @@
 package net.geekmc.turing
 
-import kotlinx.coroutines.*
-import net.geekmc.turing.command.service.CommandService
-import net.geekmc.turing.coroutine.Ticking
-import net.geekmc.turing.instance.InstanceService
-import net.geekmc.turing.motd.MotdService
+import net.geekmc.turing.configuration.SettingsConfig
 import net.minestom.server.MinecraftServer
-import net.minestom.server.coordinate.Pos
-import net.minestom.server.entity.PlayerSkin
-import net.minestom.server.event.player.PlayerLoginEvent
-import net.minestom.server.event.player.PlayerSpawnEvent
+import net.minestom.server.extras.bungee.BungeeCordProxy
 import net.minestom.server.extras.optifine.OptifineSupport
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
-import world.cepi.kstom.Manager
-import world.cepi.kstom.event.listen
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
@@ -31,79 +22,11 @@ object Turing {
 
         minecraftServer = MinecraftServer.init()
 
-        //Manager.dimensionType.
-
-        // Register Instance
-        InstanceService.initialize()
-        InstanceService.createInstanceContainer(InstanceService.MAIN_INSTANCE)
-        val world = InstanceService.getInstance(InstanceService.MAIN_INSTANCE)
-
-        // Register listeners
-        Manager.globalEvent.addListener(PlayerLoginEvent::class.java) {
-            val p = it.player
-
-            it.setSpawningInstance(world)
-            p.respawnPoint = Pos(0.0, 40.0, 0.0)
-            p.sendMessage("Welcome to server, " + p.username + " !")
-        }
-
-        // 应该放PlayerJoin Event 异步获取skin然后主线程setSkin
-        // init skin
-//        Manager.globalEvent.listen<PlayerSkinInitEvent> {
-//
-//            handler {
-//                skin = PlayerSkin.fromUsername(player.username)
-//            }
-//        }
-
-        Manager.globalEvent.listen<PlayerSpawnEvent> {
-            handler {
-                if (!isFirstSpawn) return@handler
-
-                val scope = CoroutineScope(Dispatchers.IO)
-                scope.launch {
-
-                    //println("*${Thread.currentThread().name} get skin from mojang")
-                    delay(3000)
-                    val skin = withContext(Dispatchers.IO) {
-                        PlayerSkin.fromUsername(player.username)
-                    }
-                    //println("finish get skin at ${System.currentTimeMillis()}")
-
-                    // 切到主线程设置玩家皮肤
-                    withContext(Dispatchers.Ticking) {
-                        delay(100)
-                        println("${Thread.currentThread().name} set skin")
-                        player.skin = skin
-                    }
-                    println("${Thread.currentThread().name} coroutine end")
-
-                }
-
-            }
-        }
-
-        val scope = CoroutineScope(Dispatchers.IO)
-        scope.launch {
-            println("hello")
-        }
-        scope.cancel()
-
-        val job=GlobalScope.launch {
-            println("hello")
-        }
-
-
-        job.cancel()
-
+        // optimize support
         OptifineSupport.enable()
 
-        // Register commands
-        CommandService.registerAll()
-
-        // Register motd
-        MotdService.registerMotdListener()
-        MinecraftServer.setBrandName("GeekMC")
+        // BungeeCord support
+        BungeeCordProxy.enable()
 
         if (Files.notExists(Path.of("settings.yml"))) {
             // 加/代表jar根目录，否则需要把settings放到turingserver包下
@@ -115,21 +38,25 @@ object Turing {
         dumperOptions.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
         val yaml = Yaml(dumperOptions)
 
-        val map: MutableMap<String?, Any?> = yaml.load(FileInputStream("settings.yml"))
-        map["a.233"] = 1
-        map["b"] = object : LinkedHashMap<String?, Any?>() {
-            init {
-                put("next", 2)
-            }
-        }
-        val writer = FileWriter("target.yml")
-        println("changed to block")
-        yaml.dump(map, writer)
-        println("successfully dump data to target.yml")
+//        val map: MutableMap<String?, Any?> = yaml.load(FileInputStream("settings.yml"))
+//        map["a.233"] = 1
+//        map["b"] = object : LinkedHashMap<String?, Any?>() {
+//            init {
+//                put("next", 2)
+//            }
+//        }
+//        val writer = FileWriter("target.yml")
+//        yaml.dump(map, writer)
 
-//         BungeeCordProxy.enable()
+        val settings: SettingsConfig = yaml.load(FileInputStream("settings.yml"))
+        println("port: ${settings.port}")
+        println("bungeecord: ${settings.bungeecord}")
+        println("list: ${settings.list}")
+
         //启动服务器
         minecraftServer.start("0.0.0.0", 25565)
+
+        // 在这之后才能使用协程。
 
     }
 

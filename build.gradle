@@ -23,7 +23,7 @@ jar {
 }
 
 group 'net.geekmc.turing'
-version '1.0.8'
+version '1.0.0'
 
 publishing {
     publications {
@@ -50,7 +50,7 @@ repositories {
 dependencies {
 
     // Minestom
-    implementation('com.github.Minestom:Minestom:7af3e1c2e2') {
+    implementation('com.github.Minestom:Minestom:-SNAPSHOT') {
         exclude group: 'org.tinylog'
     }
 

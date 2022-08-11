@@ -1,3 +1,8 @@
 package net.geekmc.turing.configuration
 
-data class SettingsConfig (val port:Int?,val bungeecord:Boolean?,val list:List<Int>?)
+data class SettingsConfig(
+    var port: Int? = null,
+    var bungeecord: Boolean? = null,
+    var optfine: Boolean? = null,
+    var list: List<Int>? = null
+)

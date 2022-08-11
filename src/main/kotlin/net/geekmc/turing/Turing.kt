@@ -4,8 +4,11 @@ import net.geekmc.turing.configuration.SettingsConfig
 import net.minestom.server.MinecraftServer
 import net.minestom.server.extras.bungee.BungeeCordProxy
 import net.minestom.server.extras.optifine.OptifineSupport
+import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.constructor.Construct
+import org.yaml.snakeyaml.constructor.Constructor
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
@@ -22,12 +25,6 @@ object Turing {
 
         minecraftServer = MinecraftServer.init()
 
-        // optimize support
-        OptifineSupport.enable()
-
-        // BungeeCord support
-        BungeeCordProxy.enable()
-
         if (Files.notExists(Path.of("settings.yml"))) {
             // 加/代表jar根目录，否则需要把settings放到turingserver包下
             saveResource("settings.yml")
@@ -38,7 +35,26 @@ object Turing {
         dumperOptions.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
         val yaml = Yaml(dumperOptions)
 
-//        val map: MutableMap<String?, Any?> = yaml.load(FileInputStream("settings.yml"))
+        val settings = yaml.loadAs(FileInputStream("settings.yml"), SettingsConfig::class.java)
+        if (settings.optfine!!) {
+            println("Turing >> Optfine support is enabled.")
+            OptifineSupport.enable()
+        } else {
+            println("Turing >> Optfine support is disabled.")
+        }
+
+        if (settings.bungeecord!!) {
+            println("Turing >> Bungeecord support is enabled.")
+            BungeeCordProxy.enable()
+        } else {
+            println("Turing >> Bungeecord support is disabled.")
+        }
+        //启动服务器
+        minecraftServer.start("0.0.0.0", settings.port!!)
+
+        // 在这之后才能使用协程。
+
+        //        val map: MutableMap<String?, Any?> = yaml.load(FileInputStream("settings.yml"))
 //        map["a.233"] = 1
 //        map["b"] = object : LinkedHashMap<String?, Any?>() {
 //            init {
@@ -48,18 +64,8 @@ object Turing {
 //        val writer = FileWriter("target.yml")
 //        yaml.dump(map, writer)
 
-        val settings: SettingsConfig = yaml.load(FileInputStream("settings.yml"))
-        println("port: ${settings.port}")
-        println("bungeecord: ${settings.bungeecord}")
-        println("list: ${settings.list}")
-
-        //启动服务器
-        minecraftServer.start("0.0.0.0", 25565)
-
-        // 在这之后才能使用协程。
 
     }
-
 
     fun saveResource(resourcePath: String) {
         saveResource(resourcePath, resourcePath, false)
@@ -75,10 +81,12 @@ object Turing {
 
     fun saveResource(source: String, target: String, replace: Boolean) {
         try {
-            val f = File(target).absoluteFile //一定要abs
 
-            Files.createDirectories(Path.of(f.parent))
+            val f = File(target).absoluteFile
+            Files.createDirectories(Path.of(f.parent)) // 创造文件所在文件夹的路径
 
+            // 从jar中获取资源
+            // todo 把Turing.class改了
             val inputStream = Turing::class.java.getResourceAsStream(source)
                 ?: throw IllegalArgumentException(
                     "Resource $source can't be found in " + Turing::class.java.getResource(

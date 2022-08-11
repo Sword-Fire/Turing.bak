@@ -1,5 +1,6 @@
 port: 25565
 bungeecord: false
+optfine: true
 list:
   - 1
   - 2

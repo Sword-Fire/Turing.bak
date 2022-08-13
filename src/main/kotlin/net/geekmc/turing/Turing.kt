@@ -1,33 +1,33 @@
 package net.geekmc.turing
 
-import net.geekmc.turing.configuration.SettingsConfig
+import net.geekmc.turing.configuration.ConfigFile
 import net.minestom.server.MinecraftServer
 import net.minestom.server.extras.bungee.BungeeCordProxy
 import net.minestom.server.extras.optifine.OptifineSupport
+import net.minestom.server.utils.callback.CommandCallback
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.Construct
-import org.yaml.snakeyaml.constructor.Constructor
+import world.cepi.kstom.Manager
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileWriter
 import java.io.IOException
 import java.nio.file.*
 
 
 object Turing {
 
-    lateinit var minecraftServer: MinecraftServer
+    private lateinit var server: MinecraftServer
+    private val LOGGER = LoggerFactory.getLogger(Turing::class.java)
 
     @JvmStatic
     fun main(args: Array<String>) {
 
-        minecraftServer = MinecraftServer.init()
+        server = MinecraftServer.init()
 
-        if (Files.notExists(Path.of("settings.yml"))) {
+        if (Files.notExists(Path.of("config.yml"))) {
             // 加/代表jar根目录，否则需要把settings放到turingserver包下
-            saveResource("settings.yml")
+            saveResource("/configurations/config.yml", "config.yml")
         }
 
         // 设置yaml使用的格式
@@ -35,26 +35,47 @@ object Turing {
         dumperOptions.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
         val yaml = Yaml(dumperOptions)
 
-        val settings = yaml.loadAs(FileInputStream("settings.yml"), SettingsConfig::class.java)
-        if (settings.optfine!!) {
-            println("Turing >> Optfine support is enabled.")
-            OptifineSupport.enable()
-        } else {
-            println("Turing >> Optfine support is disabled.")
-        }
+        val settings = yaml.loadAs(FileInputStream("config.yml"), ConfigFile::class.java)
 
-        if (settings.bungeecord!!) {
-            println("Turing >> Bungeecord support is enabled.")
+        // bungeecord
+        if (settings.bungeecord) {
+            LOGGER.info("Bungeecord support is enabled.")
             BungeeCordProxy.enable()
         } else {
-            println("Turing >> Bungeecord support is disabled.")
+            LOGGER.info("Bungeecord support is disabled.")
         }
+
+        // optfine
+        if (settings.optfine) {
+            LOGGER.info("Optfine support is enabled.")
+            OptifineSupport.enable()
+        } else {
+            LOGGER.info("Optfine support is disabled.")
+        }
+
+        // brand name
+        MinecraftServer.setBrandName(settings.brandName)
+
+        // unknown command
+        Manager.command.unknownCommandCallback = CommandCallback { sender, command ->
+            sender.sendMessage(settings.unknownCommandMessage.replace("{cmd}", command))
+        }
+
+        @Suppress("deprecation")
+        MinecraftServer.setChunkViewDistance(settings.chunkViewDistance)
+        @Suppress("deprecation")
+        MinecraftServer.setEntityViewDistance(settings.entityViewDistance)
+
         //启动服务器
-        minecraftServer.start("0.0.0.0", settings.port!!)
+        server.start(settings.address, settings.port)
 
         // 在这之后才能使用协程。
 
-        //        val map: MutableMap<String?, Any?> = yaml.load(FileInputStream("settings.yml"))
+//        val map: MutableMap<String?, Any?> = yaml.load(FileInputStream("config.yml"))
+//        for ((index, value) in map) {
+//            LOGGER.info("$index -> ${value?.javaClass} $value")
+//        }
+
 //        map["a.233"] = 1
 //        map["b"] = object : LinkedHashMap<String?, Any?>() {
 //            init {
@@ -64,29 +85,16 @@ object Turing {
 //        val writer = FileWriter("target.yml")
 //        yaml.dump(map, writer)
 
-
     }
 
-    fun saveResource(resourcePath: String) {
-        saveResource(resourcePath, resourcePath, false)
-    }
-
-    fun saveResource(resourcePath: String, replace: Boolean) {
-        saveResource(resourcePath, resourcePath, replace)
-    }
-
-    fun saveResource(resourcePath: String, filePath: String) {
-        saveResource(resourcePath, filePath, false)
-    }
-
-    fun saveResource(source: String, target: String, replace: Boolean) {
+    fun saveResource(source: String, target: String, replace: Boolean = false) {
         try {
 
             val f = File(target).absoluteFile
             Files.createDirectories(Path.of(f.parent)) // 创造文件所在文件夹的路径
 
             // 从jar中获取资源
-            // todo 把Turing.class改了
+            // 若改成java.getClassLoader()，则会以Turing.jar为原始文件坐标
             val inputStream = Turing::class.java.getResourceAsStream(source)
                 ?: throw IllegalArgumentException(
                     "Resource $source can't be found in " + Turing::class.java.getResource(

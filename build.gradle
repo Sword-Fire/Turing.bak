@@ -82,6 +82,9 @@ dependencies {
     // https://github.com/Project-Cepi/KStom
     implementation 'com.github.Project-Cepi:KStom:67be3adc9d'
 
+    // MiniMessage
+    implementation "net.kyori:adventure-text-minimessage:4.11.0"
+
 }
 
 test {

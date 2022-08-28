@@ -56,10 +56,6 @@ object Turing {
         // brand name
         MinecraftServer.setBrandName(settings.brandName)
 
-        // unknown command
-        Manager.command.unknownCommandCallback = CommandCallback { sender, command ->
-            sender.sendMessage(settings.unknownCommandMessage.replace("{cmd}", command))
-        }
 
         @Suppress("deprecation")
         MinecraftServer.setChunkViewDistance(settings.chunkViewDistance)

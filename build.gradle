@@ -58,6 +58,7 @@ dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib:1.6.20"
     // kotlin coroutines,which Minestom seems don't contain
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
 
     //dependency for groovy
     implementation 'org.fusesource.jansi:jansi:2.4.0'

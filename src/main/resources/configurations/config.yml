@@ -6,5 +6,3 @@ optfine: true
 chunkViewDistance: 16
 entityViewDistance: 16
 brandName: "ExampleBrandName"
-# {cmd} with be replaced with the raw command.
-unknownCommandMessage: "未知命令: {cmd}"

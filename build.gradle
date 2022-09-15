@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.6.20'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
     id 'groovy'
     id 'java'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
@@ -55,9 +55,9 @@ dependencies {
     }
 
     // kotlin
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:1.6.20"
-    // kotlin coroutines,which Minestom seems don't contain
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3")
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:1.7.10"
+    implementation('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4')
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
 
     //dependency for groovy

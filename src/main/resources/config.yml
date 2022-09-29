@@ -1,0 +1,7 @@
+address: 0.0.0.0
+port: 25565
+bungeecord: false
+optifine: true
+chunkViewDistance: 16
+entityViewDistance: 16
+brandName: "ExampleBrandName"
